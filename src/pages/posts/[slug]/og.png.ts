@@ -4,6 +4,7 @@ import { loadDefaultJapaneseParser } from 'budoux';
 import React from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
+import stylesheet from '../../../styles/global.css?inline';
 
 const parser = loadDefaultJapaneseParser();
 
@@ -74,71 +75,69 @@ export async function GET({ props }) {
     React.createElement(
       'div',
       {
-        tw: 'w-full h-full flex flex-col justify-between p-20 text-stone-900',
+        className: 'w-full h-full flex flex-col justify-between p-20 text-stone-900 bg-stone-50 border-[16px] border-stone-200',
         style: {
           fontFamily: fontData ? '"Noto Sans JP", sans-serif' : 'sans-serif',
-          backgroundColor: '#f5f5f4', // bg-stone-50
-          border: '16px solid #e7e5e4', // border-stone-200
         },
       },
       // ヘッダー部
       React.createElement(
         'div',
-        { tw: 'flex items-center justify-between border-b border-stone-200/80 pb-6' },
+        { className: 'flex items-center justify-between border-b border-stone-200/80 pb-6' },
         React.createElement(
           'span',
-          { tw: 'text-2xl font-extrabold tracking-tight text-stone-900' },
+          { className: 'text-2xl font-extrabold tracking-tight text-stone-900' },
           'みにっつ'
         ),
         React.createElement(
           'span',
-          { tw: 'text-xl text-stone-400 font-mono' },
+          { className: 'text-xl text-stone-400 font-mono' },
           'blog.minittu.net'
         )
       ),
       // メインコンテンツ部
       React.createElement(
         'div',
-        { tw: 'flex flex-col gap-5 flex-1 justify-center py-6' },
+        { className: 'flex flex-col gap-5 flex-1 justify-center py-6' },
         React.createElement(
           'div',
-          { tw: 'flex gap-2' },
+          { className: 'flex gap-2' },
           (post.data.tags || []).slice(0, 3).map((tag: string) =>
             React.createElement(
               'span',
               {
-                tw: 'px-2.5 py-0.5 text-xs font-semibold bg-stone-200/60 text-stone-600 rounded border border-stone-300/30',
+                className: 'px-2.5 py-0.5 text-xs font-semibold bg-stone-200/60 text-stone-600 rounded border border-stone-300/30',
                 key: tag,
               },
               `#${tag}`
             )
           )
         ),
-        // タイトル (BudouXの単語単位でflex-wrap配置して不自然な改行を防止)
+        // タイトル
         React.createElement(
           'h1',
           {
-            tw: 'text-5xl font-extrabold leading-snug tracking-tight text-stone-900 flex flex-wrap',
+            className: 'text-5xl font-extrabold leading-snug tracking-tight text-stone-900 flex flex-wrap',
           },
           titleChunks.map((chunk, i) =>
-            React.createElement('span', { key: i, tw: 'inline-block' }, chunk)
+            React.createElement('span', { key: i, className: 'inline-block' }, chunk)
           )
         ),
-        // 説明文 (同上)
+        // 説明文
         React.createElement(
           'p',
           {
-            tw: 'text-xl text-stone-500 font-normal leading-relaxed flex flex-wrap',
+            className: 'text-xl text-stone-500 font-normal leading-relaxed flex flex-wrap',
           },
           descriptionChunks.map((chunk, i) =>
-            React.createElement('span', { key: i, tw: 'inline-block' }, chunk)
+            React.createElement('span', { key: i, className: 'inline-block' }, chunk)
           )
         )
       ),
-      // フッター部 (Rendered with Takumiを削除し、右寄せに配置)
+      // フッター部
       React.createElement(
         'div',
-        { tw: 'flex items-center justify-end text-base text-stone-400 font-mono border-t border-stone-200/80 pt-6' },
+        { className: 'flex items-center justify-end text-base text-stone-400 font-mono border-t border-stone-200/80 pt-6' },
         React.createElement(
           'span',
           null,
@@ -154,6 +153,7 @@ export async function GET({ props }) {
       width: 1200,
       height: 630,
       fonts: fontOptions,
+      stylesheets: [stylesheet],
     }
   );
 }
