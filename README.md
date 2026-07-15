@@ -72,7 +72,7 @@ bun run dev
 ## 🔗 リンクカード
 
 記事本文で URL だけの段落を書くと、Markdown ビルド時にリンクカードへ変換されます。
-実装は Satteri プラグインとして [src/lib/satteri-link-card-plus.js](src/lib/satteri-link-card-plus.js) に置いています。
+実装は npm パッケージの `@minittupoyo/satteri-link-card` と `@minittupoyo/satteri-breaks` を使っています。
 
 ### 使い方
 

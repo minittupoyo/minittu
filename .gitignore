@@ -1,6 +1,7 @@
 # build output
 dist/
 public/remark-link-card-plus/
+public/satteri-link-card/
 
 # generated types
 .astro/

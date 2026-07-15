@@ -6,8 +6,8 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 import keystatic from '@keystatic/astro';
 import icon from 'astro-icon';
-import { createSatteriLinkCardPlus } from './src/lib/satteri-link-card-plus.js';
-import { satteriRemarkBreaks } from './src/lib/satteri-remark-breaks.js';
+import { createSatteriLinkCardPlus } from '@minittupoyo/satteri-link-card';
+import { satteriBreaks } from '@minittupoyo/satteri-breaks';
 
 const isBuild = process.env.NODE_ENV === "production" || process.env.ASTRO_COMMAND === "build";
 
@@ -16,7 +16,7 @@ export default defineConfig({
   site: "https://blog.minittu.net",
   markdown: {
     processor: satteri({
-        mdastPlugins: [satteriRemarkBreaks, createSatteriLinkCardPlus({ cache: true})],
+        mdastPlugins: [satteriBreaks, createSatteriLinkCardPlus({ cache: true})],
     }),
   },
 
