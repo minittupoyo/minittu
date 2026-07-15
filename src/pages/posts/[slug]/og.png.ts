@@ -54,10 +54,10 @@ export async function GET({ props }) {
   const { post } = props;
   const fontData = await getFontData();
 
-  const displayTitle = post.data.title.length > 36 ? `${post.data.title.slice(0, 36)}...` : post.data.title;
-  const displayDescription = post.data.description.length > 90 ? `${post.data.description.slice(0, 90)}...` : post.data.description;
+  const displayTitle = post.data.title;
+  const displayDescription = post.data.description;
 
-  // BudouXで日本語の改行位置を自然に制御
+  // BudouXで日本語の改行位置の候補を抽出
   const titleChunks = parser.parse(displayTitle);
   const descriptionChunks = parser.parse(displayDescription);
 
@@ -113,25 +113,27 @@ export async function GET({ props }) {
             )
           )
         ),
-        // タイトル
+        // タイトル: line-clamp-2で2行制限し、wbrでBudouXの改行位置を保障
         React.createElement(
           'h1',
           {
-            className: 'text-5xl font-extrabold leading-snug tracking-tight text-stone-900 flex flex-wrap',
+            className: 'text-5xl font-extrabold leading-snug tracking-tight text-stone-900 line-clamp-2',
           },
-          titleChunks.map((chunk, i) =>
-            React.createElement('span', { key: i, className: 'inline-block' }, chunk)
-          )
+          titleChunks.flatMap((chunk, i) => [
+            chunk,
+            React.createElement('wbr', { key: `t-wbr-${i}` })
+          ])
         ),
-        // 説明文
+        // 説明文: line-clamp-3で3行制限し、同様にwbrを挿入
         React.createElement(
           'p',
           {
-            className: 'text-xl text-stone-500 font-normal leading-relaxed flex flex-wrap',
+            className: 'text-xl text-stone-500 font-normal leading-relaxed line-clamp-3',
           },
-          descriptionChunks.map((chunk, i) =>
-            React.createElement('span', { key: i, className: 'inline-block' }, chunk)
-          )
+          descriptionChunks.flatMap((chunk, i) => [
+            chunk,
+            React.createElement('wbr', { key: `d-wbr-${i}` })
+          ])
         )
       ),
       // フッター部
