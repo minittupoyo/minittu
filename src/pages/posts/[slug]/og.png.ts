@@ -1,8 +1,11 @@
 import { getCollection } from 'astro:content';
 import { ImageResponse } from 'takumi-js/response';
+import { loadDefaultJapaneseParser } from 'budoux';
 import React from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
+
+const parser = loadDefaultJapaneseParser();
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -53,6 +56,10 @@ export async function GET({ props }) {
   const displayTitle = post.data.title.length > 36 ? `${post.data.title.slice(0, 36)}...` : post.data.title;
   const displayDescription = post.data.description.length > 90 ? `${post.data.description.slice(0, 90)}...` : post.data.description;
 
+  // BudouXで日本語の改行位置を自然に制御
+  const titleChunks = parser.parse(displayTitle);
+  const descriptionChunks = parser.parse(displayDescription);
+
   const fontOptions = [];
   if (fontData) {
     fontOptions.push({
@@ -70,8 +77,8 @@ export async function GET({ props }) {
         tw: 'w-full h-full flex flex-col justify-between p-20 text-stone-900',
         style: {
           fontFamily: fontData ? '"Noto Sans JP", sans-serif' : 'sans-serif',
-          backgroundColor: '#f5f5f4', // DESIGN.md: bg-stone-50 (暖かみのある非常に淡いグレー)
-          border: '16px solid #e7e5e4', // DESIGN.md: border-stone-200 相当の額縁太枠
+          backgroundColor: '#f5f5f4', // bg-stone-50
+          border: '16px solid #e7e5e4', // border-stone-200
         },
       },
       // ヘッダー部
@@ -89,7 +96,7 @@ export async function GET({ props }) {
           'blog.minittu.net'
         )
       ),
-      // メインコンテンツ部 (縦方向中央寄せ)
+      // メインコンテンツ部
       React.createElement(
         'div',
         { tw: 'flex flex-col gap-5 flex-1 justify-center py-6' },
@@ -107,30 +114,31 @@ export async function GET({ props }) {
             )
           )
         ),
+        // タイトル (BudouXの単語単位でflex-wrap配置して不自然な改行を防止)
         React.createElement(
           'h1',
           {
-            tw: 'text-5xl font-extrabold leading-snug tracking-tight text-stone-900',
+            tw: 'text-5xl font-extrabold leading-snug tracking-tight text-stone-900 flex flex-wrap',
           },
-          displayTitle
+          titleChunks.map((chunk, i) =>
+            React.createElement('span', { key: i, tw: 'inline-block' }, chunk)
+          )
         ),
+        // 説明文 (同上)
         React.createElement(
           'p',
           {
-            tw: 'text-xl text-stone-500 font-normal leading-relaxed',
+            tw: 'text-xl text-stone-500 font-normal leading-relaxed flex flex-wrap',
           },
-          displayDescription
+          descriptionChunks.map((chunk, i) =>
+            React.createElement('span', { key: i, tw: 'inline-block' }, chunk)
+          )
         )
       ),
-      // フッター部
+      // フッター部 (Rendered with Takumiを削除し、右寄せに配置)
       React.createElement(
         'div',
-        { tw: 'flex items-center justify-between text-base text-stone-400 font-mono border-t border-stone-200/80 pt-6' },
-        React.createElement(
-          'span',
-          null,
-          'Rendered with Takumi'
-        ),
+        { tw: 'flex items-center justify-end text-base text-stone-400 font-mono border-t border-stone-200/80 pt-6' },
         React.createElement(
           'span',
           null,
