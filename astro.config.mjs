@@ -13,6 +13,7 @@ const isBuild = process.env.NODE_ENV === "production" || process.env.ASTRO_COMMA
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://blog.minittu.net",
   markdown: {
     processor: satteri({
         mdastPlugins: [satteriRemarkBreaks, createSatteriLinkCardPlus({ cache: true})],
