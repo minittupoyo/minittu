@@ -4,6 +4,9 @@ description: "keystaticを導入しましたよ。"
 date: 2026-05-01T04:39:00.000Z
 tags:
   - 開発
+  - CMS
+  - Keystatic
+  - Astro
 draft: false
 ---
 ## コンテンツを楽に書きたい

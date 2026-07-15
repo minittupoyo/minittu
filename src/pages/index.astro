@@ -13,8 +13,14 @@ const posts = allPosts
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
     .slice(0, 6);
 
-// すべてのユニークなタグを抽出
-const tags = [...new Set(allPosts.flatMap((post) => post.data.tags))];
+// タグを記事数順に集計し、トップページでは主要タグだけを表示
+const tagStats = [...new Set(allPosts.flatMap((post) => post.data.tags))]
+    .map((tag) => ({
+        name: tag,
+        count: allPosts.filter((post) => post.data.tags.includes(tag)).length,
+    }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "ja"));
+const visibleTags = tagStats.slice(0, 10);
 
 // 日付フォーマットのヘルパー
 const formatDate = (date: Date) => {
@@ -46,11 +52,19 @@ const formatDate = (date: Date) => {
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <!-- メインコンテンツ：記事一覧 -->
             <div class="md:col-span-3 space-y-10">
-                <h2
-                    class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-6"
-                >
-                    最新の記事
-                </h2>
+                <div class="flex items-center justify-between gap-3 mb-6">
+                    <h2
+                        class="text-xs font-bold uppercase tracking-wider text-stone-400"
+                    >
+                        最新の記事
+                    </h2>
+                    <a
+                        href="/posts"
+                        class="text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors duration-150"
+                    >
+                        すべての記事
+                    </a>
+                </div>
 
                 {
                     posts.length === 0 ? (
@@ -100,7 +114,7 @@ const formatDate = (date: Date) => {
                                         <div class="flex flex-wrap gap-1.5 mt-auto relative z-10">
                                             {post.data.tags.map((tag) => (
                                                 <a
-                                                    href={`/tags/${tag}`}
+                                                    href={`/tags/${encodeURIComponent(tag)}`}
                                                     class="inline-flex items-center rounded-md bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-600 hover:bg-stone-200 transition-colors duration-150"
                                                 >
                                                     #{tag}
@@ -118,23 +132,42 @@ const formatDate = (date: Date) => {
             <!-- サイドバー：タグ一覧 -->
             <aside class="md:col-span-1 space-y-6">
                 <nav aria-label="タグ一覧">
-                    <h2
-                        class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-4"
-                    >
-                        タグ
-                    </h2>
-                    <div class="flex flex-wrap md:flex-col gap-2">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <h2
+                            class="text-xs font-bold uppercase tracking-wider text-stone-400"
+                        >
+                            タグ
+                        </h2>
+                        <a
+                            href="/tags"
+                            class="text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors duration-150"
+                        >
+                            すべて
+                        </a>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
                         {
-                            tags.map((tag) => (
+                            visibleTags.map((tag) => (
                                 <a
-                                    href={`/tags/${tag}`}
-                                    class="inline-flex items-center rounded-md bg-white border border-stone-200/80 px-2.5 py-1 text-xs font-medium text-stone-700 hover:border-stone-400 hover:bg-stone-50 transition-all duration-150 md:w-fit"
+                                    href={`/tags/${encodeURIComponent(tag.name)}`}
+                                    class="inline-flex items-center gap-1 rounded-md bg-white border border-stone-200/80 px-2.5 py-1 text-xs font-medium text-stone-700 hover:border-stone-400 hover:bg-stone-50 transition-all duration-150"
                                 >
-                                    #{tag}
+                                    <span>#{tag.name}</span>
+                                    <span class="text-stone-400">{tag.count}</span>
                                 </a>
                             ))
                         }
                     </div>
+                    {
+                        tagStats.length > visibleTags.length && (
+                            <a
+                                href="/tags"
+                                class="mt-4 inline-flex items-center justify-center w-full rounded-md border border-stone-200 bg-stone-100/70 px-3 py-2 text-xs font-semibold text-stone-600 hover:border-stone-300 hover:bg-white hover:text-stone-900 transition-all duration-150"
+                            >
+                                全{tagStats.length}件のタグを見る
+                            </a>
+                        )
+                    }
                 </nav>
             </aside>
         </div>

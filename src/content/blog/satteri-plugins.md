@@ -4,9 +4,10 @@ description: "Astro v7でMarkdownプロセッサがSatteriになったので、r
 date: 2026-07-15T14:00:00.000Z
 tags:
   - Satteri
-  - CodeX
   - Astro
-  - GPT-5.5
+  - Markdown
+  - リンクカード
+  - AI
 draft: false
 ---
 

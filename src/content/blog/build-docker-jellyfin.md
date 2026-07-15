@@ -4,6 +4,8 @@ description: "DockerでJellyfinを構築する方法"
 date: 2026-05-09T07:30:00.000Z
 tags:
   - 自宅サーバー
+  - Docker
+  - Jellyfin
 draft: false
 ---
 ## Jellyfin

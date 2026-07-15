@@ -5,6 +5,7 @@ date: 2026-04-21T19:38:00.000Z
 tags:
   - Nuxt
   - 開発
+  - ブログ
 draft: false
 ---
 ## ガチNuxt初学者

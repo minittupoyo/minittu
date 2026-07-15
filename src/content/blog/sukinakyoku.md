@@ -3,6 +3,7 @@ title: "好きな音楽とか"
 description: "好きな音楽とかを語るだけ"
 date: 2026-04-23T20:00:00.000Z
 tags:
+  - 音楽
   - 雑記
 draft: false
 ---

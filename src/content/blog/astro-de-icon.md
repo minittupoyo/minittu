@@ -4,6 +4,8 @@ description: "Astroでアイコンを使う方法です。"
 date: 2026-04-18T14:46:00.000Z
 tags:
   - Astro
+  - アイコン
+  - Astro Icon
 draft: false
 ---
 ## Astroでアイコン

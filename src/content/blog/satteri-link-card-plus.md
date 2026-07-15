@@ -5,6 +5,7 @@ date: 2026-07-15T15:00:00.000Z
 tags:
   - Satteri
   - Astro
+  - リンクカード
   - 開発
 draft: false
 ---

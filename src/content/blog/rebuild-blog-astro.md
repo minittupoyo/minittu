@@ -4,7 +4,9 @@ description: Astroでブログを作り直したよ。
 date: 2026-07-15
 tags:
   - Astro
-  - 雑記
+  - Astro v7
+  - ブログ
+  - AI
 draft: false
 ---
 ## 変わりまくるスタック

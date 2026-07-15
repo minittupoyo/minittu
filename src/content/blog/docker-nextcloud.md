@@ -3,7 +3,9 @@ title: "DockerでNextCloudを動かす"
 description: "DockerでNextCloudを動かしたときのログです。"
 date: 2026-04-30T10:56:00.000Z
 tags:
-  - 雑記
+  - 自宅サーバー
+  - Docker
+  - Nextcloud
 draft: false
 ---
 ## NextCloud

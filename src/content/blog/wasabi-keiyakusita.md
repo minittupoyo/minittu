@@ -3,7 +3,9 @@ title: "wasabiを契約してみた"
 description: "wasabiを契約したので使ってみたよ。"
 date: 2026-04-25T12:35:00.000Z
 tags:
-  - 雑記
+  - ストレージ
+  - Wasabi
+  - rclone
 draft: false
 ---
 ## wasabiとは

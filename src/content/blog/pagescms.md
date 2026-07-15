@@ -4,6 +4,8 @@ description: "PagesCMSを布教する記事"
 date: 2026-04-19T23:30:00.000Z
 tags:
   - 開発
+  - CMS
+  - PagesCMS
 draft: false
 ---
 ## コンテンツ管理
