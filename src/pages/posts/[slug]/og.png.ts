@@ -67,29 +67,32 @@ export async function GET({ props }) {
     React.createElement(
       'div',
       {
-        tw: 'w-full h-full flex flex-col justify-between p-20 text-white font-sans',
+        tw: 'w-full h-full flex flex-col justify-between p-20 text-stone-900',
         style: {
           fontFamily: fontData ? '"Noto Sans JP", sans-serif' : 'sans-serif',
-          background: 'linear-gradient(135deg, #1c1917 0%, #0c0a09 100%)',
+          backgroundColor: '#f5f5f4', // DESIGN.md: bg-stone-50 (暖かみのある非常に淡いグレー)
+          border: '16px solid #e7e5e4', // DESIGN.md: border-stone-200 相当の額縁太枠
         },
       },
+      // ヘッダー部
       React.createElement(
         'div',
-        { tw: 'flex items-center justify-between' },
+        { tw: 'flex items-center justify-between border-b border-stone-200/80 pb-6' },
         React.createElement(
           'span',
-          { tw: 'text-3xl font-extrabold tracking-tight text-[#ff4d4d]' },
+          { tw: 'text-2xl font-extrabold tracking-tight text-stone-900' },
           'みにっつ'
         ),
         React.createElement(
           'span',
-          { tw: 'text-xl text-stone-500 font-mono' },
+          { tw: 'text-xl text-stone-400 font-mono' },
           'blog.minittu.net'
         )
       ),
+      // メインコンテンツ部 (縦方向中央寄せ)
       React.createElement(
         'div',
-        { tw: 'flex flex-col gap-6' },
+        { tw: 'flex flex-col gap-5 flex-1 justify-center py-6' },
         React.createElement(
           'div',
           { tw: 'flex gap-2' },
@@ -97,7 +100,7 @@ export async function GET({ props }) {
             React.createElement(
               'span',
               {
-                tw: 'px-3 py-1 text-sm bg-stone-800 text-stone-300 rounded-full border border-stone-700/50',
+                tw: 'px-2.5 py-0.5 text-xs font-semibold bg-stone-200/60 text-stone-600 rounded border border-stone-300/30',
                 key: tag,
               },
               `#${tag}`
@@ -107,25 +110,26 @@ export async function GET({ props }) {
         React.createElement(
           'h1',
           {
-            tw: 'text-6xl font-extrabold leading-snug tracking-tight text-white',
+            tw: 'text-5xl font-extrabold leading-snug tracking-tight text-stone-900',
           },
           displayTitle
         ),
         React.createElement(
           'p',
           {
-            tw: 'text-2xl text-[#a8a29a] font-normal leading-relaxed',
+            tw: 'text-xl text-stone-500 font-normal leading-relaxed',
           },
           displayDescription
         )
       ),
+      // フッター部
       React.createElement(
         'div',
-        { tw: 'flex items-center justify-between text-lg text-stone-500 font-mono border-t border-stone-800 pt-6' },
+        { tw: 'flex items-center justify-between text-base text-stone-400 font-mono border-t border-stone-200/80 pt-6' },
         React.createElement(
           'span',
           null,
-          'Rendered with Takumi (Rust)'
+          'Rendered with Takumi'
         ),
         React.createElement(
           'span',
