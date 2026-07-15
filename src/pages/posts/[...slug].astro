@@ -1,0 +1,193 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog', ({ data }) => {
+		return import.meta.env.DEV ? true : !data.draft;
+	});
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: { post },
+	}));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+
+// 目次用に見出しをフィルタリング（h2, h3のみ）
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+
+// 日付フォーマットのヘルパー
+const formatDate = (date: Date) => {
+	return date.toLocaleDateString('ja-JP', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+};
+
+// 関連記事や、前後の記事を取得することもできるが、まずはシンプルに記事詳細を表示する
+const allPosts = await getCollection('blog', ({ data }) => {
+	return import.meta.env.DEV ? true : !data.draft;
+});
+const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const currentIndex = sortedPosts.findIndex((p) => p.id === post.id);
+const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+---
+
+<Layout 
+	title={`${post.data.title} | みにっつのブログ`} 
+	description={post.data.description}
+	image={`/posts/${post.id}/og.png`}
+>
+	<div class="grid grid-cols-1 lg:grid-cols-4 gap-12 max-w-5xl mx-auto">
+		<!-- メインコンテンツ -->
+		<div class="lg:col-span-3 max-w-2xl">
+		<!-- 戻るリンク -->
+		<a 
+			href="/" 
+			class="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900 transition-colors duration-200 mb-8"
+		>
+			<Icon name="tabler:arrow-left" class="w-4 h-4" aria-hidden="true" />
+			一覧に戻る
+		</a>
+
+		<!-- 記事ヘッダー -->
+		<header class="mb-10 pb-8 border-b border-stone-200/60">
+			<div class="flex items-center gap-2 text-xs text-stone-500 mb-3">
+				<time datetime={post.data.date.toISOString()}>
+					{formatDate(post.data.date)}
+				</time>
+				{post.data.draft && (
+					<span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded-sm font-medium">
+						下書き
+					</span>
+				)}
+			</div>
+			
+			<h1 class="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight leading-tight mb-4">
+				{post.data.title}
+			</h1>
+			
+			<p class="text-base text-stone-600 leading-relaxed mb-6 font-medium">
+				{post.data.description}
+			</p>
+			
+			<div class="flex flex-wrap gap-1.5">
+				{post.data.tags.map((tag) => (
+					<a
+						href={`/tags/${tag}`}
+						class="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600 hover:bg-stone-200 transition-colors duration-150"
+					>
+						#{tag}
+					</a>
+				))}
+			</div>
+		</header>
+
+		{post.data.heroImage && (
+			<div class="mb-10 rounded-xl overflow-hidden aspect-video bg-stone-100 border border-stone-200/50">
+				<Image 
+					src={post.data.heroImage} 
+					alt={post.data.title}
+					class="w-full h-full object-cover"
+					width={1200}
+					height={675}
+					loading="eager"
+				/>
+			</div>
+		)}
+
+		{toc.length > 0 && (
+			<div class="lg:hidden">
+				<nav class="mb-10 p-5 bg-stone-50 border border-stone-200/60 rounded-xl" aria-label="目次">
+					<h2 class="text-sm font-bold text-stone-900 mb-3 flex items-center gap-2">
+						<Icon name="tabler:list" class="w-4 h-4 text-stone-500" aria-hidden="true" />
+						目次
+					</h2>
+					<ul class="space-y-2 text-sm">
+						{toc.map((heading) => (
+							<li class={heading.depth === 3 ? "pl-5" : ""}>
+								<a 
+									href={`#${heading.slug}`} 
+									class="text-stone-600 hover:text-stone-900 transition-colors duration-150 flex items-start gap-1"
+								>
+									<span class="text-stone-300 select-none">#</span>
+									<span>{heading.text}</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				</nav>
+			</div>
+		)}
+
+		<!-- 記事本文 -->
+		<article class="prose prose-stone max-w-none">
+			<Content />
+		</article>
+
+		<!-- 前後のナビゲーション -->
+		<nav class="mt-16 pt-8 border-t border-stone-200 flex flex-col sm:flex-row justify-between gap-4">
+			{prevPost ? (
+				<a 
+					href={`/posts/${prevPost.id}`} 
+					class="w-full sm:flex-1 group p-4 border border-stone-200 hover:border-stone-300 rounded-xl transition-all duration-200 text-left"
+				>
+					<span class="text-xs text-stone-400 block mb-1">前の記事</span>
+					<span class="text-sm font-bold text-stone-800 group-hover:text-stone-900 transition-colors line-clamp-2">
+						{prevPost.data.title}
+					</span>
+				</a>
+			) : (
+				<div class="hidden sm:block sm:flex-1" />
+			)}
+			
+			{nextPost ? (
+				<a 
+					href={`/posts/${nextPost.id}`} 
+					class="w-full sm:flex-1 group p-4 border border-stone-200 hover:border-stone-300 rounded-xl transition-all duration-200 text-right"
+				>
+					<span class="text-xs text-stone-400 block mb-1">次の記事</span>
+					<span class="text-sm font-bold text-stone-800 group-hover:text-stone-900 transition-colors line-clamp-2">
+						{nextPost.data.title}
+					</span>
+				</a>
+			) : (
+				<div class="hidden sm:block sm:flex-1" />
+			)}
+		</nav>
+		</div>
+
+		<!-- デスクトップ用サイドバー（目次） -->
+		{toc.length > 0 && (
+			<aside class="lg:col-span-1 hidden lg:block">
+				<div class="sticky top-24 self-start">
+					<nav class="space-y-4" aria-label="目次">
+						<h2 class="text-xs font-bold uppercase tracking-wider text-stone-400 flex items-center gap-2">
+							<Icon name="tabler:list" class="w-4 h-4 text-stone-500" aria-hidden="true" />
+							目次
+						</h2>
+						<ul class="space-y-3 text-xs leading-relaxed">
+							{toc.map((heading) => (
+								<li class={heading.depth === 3 ? "pl-3" : ""}>
+									<a 
+										href={`#${heading.slug}`} 
+										class="text-stone-500 hover:text-stone-900 transition-colors duration-150 flex items-start gap-1"
+									>
+										<span class="text-stone-300 select-none">#</span>
+										<span class="line-clamp-2">{heading.text}</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				</div>
+			</aside>
+		)}
+	</div>
+</Layout>
