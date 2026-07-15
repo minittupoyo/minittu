@@ -1,7 +1,19 @@
-# AGANA ブログ
+# みにっつのブログ
 
-過度な装飾を削ぎ落とし、読みやすさを最優先したミニマルな個人ブログです。
+みにっつの超個人的備忘録。過度な装飾を削ぎ落とし、読みやすさを最優先したミニマルな個人ブログです。
 本番ビルド時は純粋な静的サイト（SSG）として出力され、開発時は **Keystatic** によるビジュアルエディタを使って直感的に記事を執筆できます。
+
+---
+
+## ⚡ 主な機能・特徴
+
+*   **Astro v7 & Satteri**: デフォルトの軽量 Markdown プロセッサ `Satteri` を採用し、高速なビルドと優れたレンダリングパフォーマンスを実現しています。
+*   **Keystatic によるビジュアル執筆**: ローカルで `/keystatic` にアクセスするだけで、直感的にリッチテキストや画像を挿入しながら執筆できます。
+*   **画像アセットの自動最適化**: ブログ記事内の画像（カバー画像や本文内の画像）はすべて `src/assets/images/blog/` に集約され、ビルド時に自動で WebP へ変換・圧縮されるため、ページの表示速度向上とレイアウトシフト（CLS）の防止が担保されています。
+*   **レスポンシブな1カラムレイアウト**: 記事リストカードは PC 画面では左右並び、モバイルでは縦並びになる1カラム構成となっており、横長スペースを有効活用しつつ認知負荷を低く抑えた設計です。
+*   **追従型目次（Table of Contents）**: 記事の見出し（H2, H3）を自動解析して目次を生成します。PC表示時はサイドバーに Sticky 固定（スクロール追従）され、モバイル表示時は本文の直前にインラインカードとして表示されます。また、ヘッダーに重ならないようにスムーズスクロールのジャンプ位置を調整しています。
+*   **Takumi-js による超高速 OG 画像生成**: Rust 製画像レンダラー `takumi-js` を使用し、ビルド時に各記事専用の OGP 画像（PNG）を1枚あたり約30msという超高速で動的生成します。ネットワークが不安定な環境でも例外をキャッチして安全にビルドを完遂するフォールバック機構付きです。
+*   **Astro-icon (Tabler Icons)**: アイコンのインライン描画には軽量な `astro-icon` を導入し、Tabler Icons をシームレスに利用しています。
 
 ---
 
@@ -19,8 +31,8 @@ bun run dev
 
 ### 2. Keystatic での記事執筆
 ブラウザで `/keystatic` にアクセスすると、ビジュアルエディタが起動します。
-*   新しい記事を作成すると、`src/content/blog/` ディレクトリに YAMLフロントマター付きの Markdown（MDX形式）ファイルが自動生成されます。
-*   執筆した内容は、そのままローカルファイルとして保存されます。
+*   新しい記事を作成すると、`src/content/blog/` ディレクトリに YAMLフロントマター付きの Markdown ファイルが自動生成されます。
+*   アップロードされた画像は自動的に `src/assets/images/blog/` へ保存され、記事内からは相対パスで正しくリンクされます。
 
 ---
 
@@ -29,12 +41,16 @@ bun run dev
 ```text
 /
 ├── src/
+│   ├── assets/
+│   │   ├── fonts/          # フォントキャッシュ（自動ダウンロード）
+│   │   └── images/blog/    # 記事で使用する画像アセット（自動最適化）
 │   ├── content/
 │   │   └── blog/           # 記事のMarkdownファイルが格納されます
 │   ├── layouts/            # 共通レイアウト
-│   ├── pages/              # 各ページのルーティング
+│   ├── lib/                # Satteriのカスタムプラグイン（breaks, link-card）
+│   ├── pages/              # 各ページのルーティングおよびOG画像生成エンドポイント
 │   └── styles/
-│       └── global.css      # Tailwind CSSおよびグローバルスタイル
+│       └── global.css      # Tailwind CSSおよびグローバルスタイル（目次・インラインコード調整など）
 ├── keystatic.config.ts     # Keystaticのスキーマ定義ファイル
 ├── astro.config.mjs        # Astroの設定ファイル
 └── DESIGN.md               # ブログのデザインガイドライン
@@ -48,7 +64,7 @@ bun run dev
 | :--- | :--- |
 | `bun install` | 依存パッケージのインストール |
 | `bun run dev` | 開発サーバーの起動（ローカル執筆用） |
-| `bun run build` | 本番用の静的HTMLビルド（`./dist/`に出力） |
+| `bun run build` | 本番用の静的HTMLおよびOGP画像のビルド（`./dist/`に出力） |
 | `bun run preview` | ビルドした静的ファイルのローカルプレビュー |
 
 ---
@@ -56,7 +72,7 @@ bun run dev
 ## 🔗 リンクカード
 
 記事本文で URL だけの段落を書くと、Markdown ビルド時にリンクカードへ変換されます。
-実装は `remark-link-card-plus` 相当の Sätteri プラグインとして [src/lib/satteri-link-card-plus.js](src/lib/satteri-link-card-plus.js) に置いています。
+実装は Satteri プラグインとして [src/lib/satteri-link-card-plus.js](src/lib/satteri-link-card-plus.js) に置いています。
 
 ### 使い方
 
@@ -67,85 +83,7 @@ https://example.com/articles/hello
 上のように、1 行に URL だけを書いた段落がカード化されます。
 通常のインラインリンクや、リスト内の URL はカード化されません。
 
-```md
-[通常のリンク](https://example.com)
-
-- https://example.com
-```
-
-リンクカードは `open-graph-scraper` で対象ページの Open Graph / Twitter Card / `<title>` / favicon を取得して生成されます。
-取得に失敗した場合もビルドは落とさず、ホスト名と favicon を使ったフォールバックのカードを生成します。
-
-### 設定
-
-Astro の Markdown processor に Sätteri プラグインとして登録します。
-現在は OGP 画像と favicon を `public/remark-link-card-plus/` にキャッシュする設定です。
-
-```js
-// astro.config.mjs
-import { satteri } from '@astrojs/markdown-satteri';
-import { createSatteriLinkCardPlus } from './src/lib/satteri-link-card-plus.js';
-import { satteriRemarkBreaks } from './src/lib/satteri-remark-breaks.js';
-
-export default defineConfig({
-  markdown: {
-    processor: satteri({
-      mdastPlugins: [
-        satteriRemarkBreaks,
-        createSatteriLinkCardPlus({ cache: true }),
-      ],
-    }),
-  },
-});
-```
-
-### オプション
-
-| オプション | 既定値 | 説明 |
-| :--- | :--- | :--- |
-| `cache` | `false` | 画像と favicon を `public/remark-link-card-plus/` に保存し、`/remark-link-card-plus/...` として参照します。 |
-| `shortenUrl` | `true` | カード下部の URL 表示をホスト名だけにします。`false` で完全な URL を表示します。 |
-| `thumbnailPosition` | `'right'` | サムネイル位置。`'left'` または `'right'` を指定できます。 |
-| `noThumbnail` | `false` | `true` の場合、OGP 画像を表示しません。 |
-| `noFavicon` | `false` | `true` の場合、favicon を表示しません。 |
-| `ignoreExtensions` | `[]` | 指定した拡張子の URL をカード化しません。例: `['.pdf', '.mp4']` |
-| `timeoutMs` | `10000` | OGP 取得と画像キャッシュ時のタイムアウト時間です。 |
-| `ogTransformer` | `undefined` | 取得した OGP 情報を描画前に加工できます。 |
-
-`ogTransformer` は `{ title, description, faviconUrl, imageUrl }` と `URL` を受け取り、同じ形のオブジェクトを返します。
-
-```js
-createSatteriLinkCardPlus({
-  ogTransformer: (og, url) => {
-    if (url.hostname === 'github.com') {
-      return { ...og, title: `GitHub: ${og.title}` };
-    }
-
-    return og;
-  },
-});
-```
-
-### スタイリング
-
-生成される HTML は `remark-link-card-plus` 互換の class 名を使います。
-見た目はグローバル CSS 側で調整してください。
-
-```css
-.remark-link-card-plus__container {}
-.remark-link-card-plus__card {}
-.remark-link-card-plus__main {}
-.remark-link-card-plus__content {}
-.remark-link-card-plus__title {}
-.remark-link-card-plus__description {}
-.remark-link-card-plus__meta {}
-.remark-link-card-plus__favicon {}
-.remark-link-card-plus__url {}
-.remark-link-card-plus__thumbnail {}
-.remark-link-card-plus__image {}
-```
-
 ---
 
 ## 🎨 デザインガイドライン
-このブログのデザイン仕様（配色、タイポグラフィ、余白のルール）については [DESIGN.md](file:///home/mimi/agana/DESIGN.md) を参照してください。
+このブログのデザイン仕様（配色、タイポグラフィ、余白のルール、画像最適化ルール）については [DESIGN.md](DESIGN.md) を参照してください。
