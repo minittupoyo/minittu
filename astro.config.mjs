@@ -9,7 +9,6 @@ import icon from 'astro-icon';
 import { createSatteriLinkCardPlus } from './src/lib/satteri-link-card-plus.js';
 import { satteriRemarkBreaks } from './src/lib/satteri-remark-breaks.js';
 
-// 本番ビルド（SSG出力）の際は Keystatic の SSR/API 用エンドポイント生成を回避するため除外する
 const isBuild = process.env.NODE_ENV === "production" || process.env.ASTRO_COMMAND === "build";
 
 // https://astro.build/config
@@ -19,12 +18,14 @@ export default defineConfig({
         mdastPlugins: [satteriRemarkBreaks, createSatteriLinkCardPlus({ cache: true})],
     }),
   },
+
   integrations: [
     react(),
     icon(),
     ...(isBuild ? [] : [keystatic()]),
   ],
+
   vite: {
     plugins: [tailwindcss()]
-  }
+  },
 });

@@ -1,0 +1,16 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"compatibility_date": "2026-07-15",
+	"compatibility_flags": ["global_fetch_strictly_public"],
+	"name": "minittu-blog",
+	"assets": {
+		"directory": "./dist",
+	},
+	"observability": {
+		"enabled": true
+	},
+	"route": {
+    "pattern": "blog.minittu.net",
+    "custom_domain": true
+	}
+}
