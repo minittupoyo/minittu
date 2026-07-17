@@ -9,6 +9,8 @@ import icon from 'astro-icon';
 import { createSatteriLinkCardPlus } from '@minittupoyo/satteri-link-card';
 import { satteriBreaks } from '@minittupoyo/satteri-breaks';
 
+import expressiveCode from 'astro-expressive-code';
+
 const isBuild = process.env.NODE_ENV === "production" || process.env.ASTRO_COMMAND === "build";
 
 // https://astro.build/config
@@ -20,11 +22,7 @@ export default defineConfig({
     }),
   },
 
-  integrations: [
-    react(),
-    icon(),
-    ...(isBuild ? [] : [keystatic()]),
-  ],
+  integrations: [react(), icon(), ...(isBuild ? [] : [keystatic()]), expressiveCode()],
 
   vite: {
     plugins: [tailwindcss()]
