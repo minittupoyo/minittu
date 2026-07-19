@@ -9,7 +9,9 @@ import stylesheet from '../../../styles/global.css?inline';
 const parser = loadDefaultJapaneseParser();
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = await getCollection('blog', ({ data }) => {
+    return import.meta.env.DEV ? true : !data.draft;
+  });
   return posts.map((post) => ({
     params: { slug: post.id },
     props: { post },

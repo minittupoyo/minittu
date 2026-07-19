@@ -1,0 +1,23 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	tool: {
+		label: string;
+		icon: string;
+		description: string;
+	};
+}
+
+const { tool } = Astro.props;
+---
+
+<div class="flex items-start gap-3">
+	<span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-stone-100 text-stone-600">
+		<Icon name={tool.icon} class="h-5 w-5" aria-hidden="true" />
+	</span>
+	<div>
+		<h2 class="text-base font-bold text-stone-900">{tool.label}</h2>
+		<p class="mt-1 text-xs leading-relaxed text-stone-500">{tool.description}</p>
+	</div>
+</div>
