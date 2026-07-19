@@ -34,7 +34,8 @@
     "react-dom": "^19.2.7",
     "satteri": "^0.9.5",
     "tailwindcss": "^4.3.2",
-    "takumi-js": "^2.2.1"
+    "takumi-js": "^2.2.1",
+    "xxhash-wasm": "^1.1.0"
   },
   "devDependencies": {
     "wrangler": "^4.111.0"
