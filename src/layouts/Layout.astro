@@ -17,6 +17,15 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin);
+const currentPath = Astro.url.pathname;
+const navItems = [
+	{ href: '/', label: 'Home' },
+	{ href: '/posts', label: 'Posts' },
+	{ href: '/tags', label: 'Tags' },
+	{ href: '/tools', label: 'Tools' },
+	{ href: '/about', label: 'About' },
+];
+const isCurrentPage = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 ---
 
 <!doctype html>
@@ -27,6 +36,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin)
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
+		<script is:inline>
+			try {
+				const hue = localStorage.getItem('theme-hue');
+				if (hue !== null && Number.isFinite(Number(hue))) {
+					document.documentElement.style.setProperty('--theme-hue', String(Math.min(360, Math.max(0, Number(hue)))));
+				}
+			} catch {}
+		</script>
 
 		<!-- Canonical URL -->
 		<link rel="canonical" href={canonicalURL} />
@@ -65,8 +82,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin)
 			}
 
 			.mobile-nav-panel[data-state='open'] {
-				max-height: 16rem;
+				max-height: calc(100dvh - 4rem);
 				opacity: 1;
+				overflow-y: auto;
+				overscroll-behavior: contain;
 				pointer-events: auto;
 				transform: translateY(0);
 			}
@@ -121,11 +140,27 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin)
 				transform: rotate(0deg) scale(1);
 			}
 
+			.theme-picker-panel {
+				position: absolute;
+				inset-block-start: calc(100% + 0.75rem);
+				inset-inline-end: 0;
+				width: 15rem;
+			}
+
+			[data-theme-chevron] {
+				transition: rotate 180ms cubic-bezier(0.22, 1, 0.36, 1);
+			}
+
+			[data-mobile-theme][open] [data-theme-chevron] {
+				rotate: 180deg;
+			}
+
 			@media (prefers-reduced-motion: reduce) {
 				.mobile-nav-panel,
 				.mobile-nav-panel a,
 				[data-menu-toggle] [data-menu-open-icon],
-				[data-menu-toggle] [data-menu-close-icon] {
+				[data-menu-toggle] [data-menu-close-icon],
+				[data-theme-chevron] {
 					transition: none;
 				}
 			}
@@ -137,13 +172,35 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin)
 				<a href="/" class="text-xl font-bold tracking-tight text-stone-900 hover:text-stone-700 transition-colors duration-200">
 					みにっつ
 				</a>
-				<nav class="hidden md:flex items-center gap-6" aria-label="メインナビゲーション">
-					<a href="/" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors duration-200">Home</a>
-					<a href="/posts" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors duration-200">Posts</a>
-					<a href="/tags" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors duration-200">Tags</a>
-					<a href="/tools" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors duration-200">Tools</a>
-					<a href="/about" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors duration-200">About</a>
+				<div class="hidden md:flex items-center gap-3">
+				<nav class="flex items-center gap-0.5 rounded-lg border border-stone-200/70 bg-stone-100/70 p-1" aria-label="メインナビゲーション">
+					{navItems.map((item) => (
+						<a
+							href={item.href}
+							aria-current={isCurrentPage(item.href) ? 'page' : undefined}
+							class:list={[
+								'inline-flex min-h-9 items-center rounded-md px-2.5 text-[0.8125rem] font-medium transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-500',
+								isCurrentPage(item.href)
+									? 'bg-white text-stone-900 shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+									: 'text-stone-600 hover:bg-white/60 hover:text-stone-900',
+							]}
+						>
+							{item.label}
+						</a>
+					))}
 				</nav>
+				<details class="relative" data-theme-picker>
+					<summary class="list-none cursor-pointer inline-flex h-9 w-9 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-600 transition-colors hover:border-stone-300 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-500" aria-label="テーマカラーを変更">
+						<Icon name="tabler:palette" class="h-4.5 w-4.5" aria-hidden="true" />
+					</summary>
+					<div class="theme-picker-panel rounded-lg border border-stone-200 bg-white p-4 shadow-[0_6px_20px_rgba(0,0,0,0.08)]">
+						<label class="block text-xs font-medium text-stone-700" for="theme-hue-desktop">テーマの色相 <output class="float-right tabular-nums text-stone-500" data-hue-output>55°</output></label>
+						<div class="theme-hue-preview mt-2 h-2 rounded-full" aria-hidden="true"></div>
+						<input id="theme-hue-desktop" class="theme-hue-range mt-1 block w-full" type="range" min="0" max="360" value="55" data-hue-input />
+						<button class="mt-2 text-xs text-stone-500 underline decoration-stone-300 underline-offset-4 hover:text-stone-900" type="button" data-hue-reset>初期色に戻す</button>
+					</div>
+				</details>
+				</div>
 				<button
 					type="button"
 					class="md:hidden relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700 transition-colors duration-150 hover:border-stone-300 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2"
@@ -166,11 +223,32 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin)
 				inert
 			>
 				<div class="max-w-4xl mx-auto grid gap-1 py-3">
-					<a href="/" class="rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900 transition-colors duration-150">Home</a>
-					<a href="/posts" class="rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900 transition-colors duration-150">Posts</a>
-					<a href="/tags" class="rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900 transition-colors duration-150">Tags</a>
-					<a href="/tools" class="rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900 transition-colors duration-150">Tools</a>
-					<a href="/about" class="rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900 transition-colors duration-150">About</a>
+					{navItems.map((item) => (
+						<a
+							href={item.href}
+							aria-current={isCurrentPage(item.href) ? 'page' : undefined}
+							class:list={[
+								'rounded-md px-3 py-2 text-sm font-medium transition-colors duration-150',
+								isCurrentPage(item.href) ? 'bg-stone-100 text-stone-900' : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900',
+							]}
+						>
+							{item.label}
+						</a>
+					))}
+					<details class="mt-2 border-t border-stone-200 pt-2" data-mobile-theme>
+						<summary class="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-md px-3 text-sm font-medium text-stone-700 hover:bg-stone-100 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-500">
+							<Icon name="tabler:palette" class="h-4 w-4 text-stone-500" aria-hidden="true" />
+							<span>テーマカラー</span>
+							<output class="ml-auto tabular-nums text-xs font-normal text-stone-500" data-hue-output>55°</output>
+							<Icon name="tabler:chevron-down" class="h-4 w-4 text-stone-400" aria-hidden="true" data-theme-chevron />
+						</summary>
+						<div class="mx-3 mb-2 mt-1 rounded-lg border border-stone-200 bg-stone-50/70 p-3">
+							<label class="sr-only" for="theme-hue-mobile">テーマの色相</label>
+							<div class="theme-hue-preview h-2 rounded-full" aria-hidden="true"></div>
+							<input id="theme-hue-mobile" class="theme-hue-range mt-1 block w-full" type="range" min="0" max="360" value="55" data-hue-input />
+							<button class="mt-1 min-h-8 text-xs text-stone-500 underline decoration-stone-300 underline-offset-4 hover:text-stone-900" type="button" data-hue-reset>初期色に戻す</button>
+						</div>
+					</details>
 				</div>
 			</nav>
 		</header>
@@ -185,6 +263,46 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin)
 			</div>
 		</footer>
 		<script>
+			const defaultHue = 55;
+			const hueInputs = document.querySelectorAll('[data-hue-input]');
+			const hueOutputs = document.querySelectorAll('[data-hue-output]');
+
+			function setHue(value, persist = true) {
+				const hue = Math.min(360, Math.max(0, Number(value) || 0));
+				document.documentElement.style.setProperty('--theme-hue', String(hue));
+				hueInputs.forEach((input) => {
+					if (input instanceof HTMLInputElement) input.value = String(hue);
+				});
+				hueOutputs.forEach((output) => {
+					output.textContent = `${hue}°`;
+				});
+				if (persist) {
+					try { localStorage.setItem('theme-hue', String(hue)); } catch {}
+				}
+			}
+
+			const initialHue = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--theme-hue'));
+			setHue(Number.isFinite(initialHue) ? initialHue : defaultHue, false);
+			hueInputs.forEach((input) => input.addEventListener('input', (event) => {
+				if (event.currentTarget instanceof HTMLInputElement) setHue(event.currentTarget.value);
+			}));
+			document.querySelectorAll('[data-hue-reset]').forEach((button) => {
+				button.addEventListener('click', () => {
+					try { localStorage.removeItem('theme-hue'); } catch {}
+					setHue(defaultHue, false);
+				});
+			});
+
+			const themePickers = document.querySelectorAll('[data-theme-picker]');
+			document.addEventListener('pointerdown', (event) => {
+				const eventPath = event.composedPath();
+				themePickers.forEach((picker) => {
+					if (picker instanceof HTMLDetailsElement && picker.open && !eventPath.includes(picker)) {
+						picker.open = false;
+					}
+				});
+			});
+
 			const toggle = document.querySelector('[data-menu-toggle]');
 			const nav = document.querySelector('[data-mobile-nav]');
 
@@ -196,6 +314,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin)
 				nav.dataset.state = open ? 'open' : 'closed';
 				nav.setAttribute('aria-hidden', String(!open));
 				nav.toggleAttribute('inert', !open);
+				if (!open) {
+					const mobileTheme = nav.querySelector('[data-mobile-theme]');
+					if (mobileTheme instanceof HTMLDetailsElement) mobileTheme.open = false;
+				}
 			}
 
 			toggle?.addEventListener('click', () => {
