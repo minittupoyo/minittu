@@ -11,6 +11,7 @@ export default config({
       path: 'src/content/blog/*',
       format: { contentField: 'content' },
       entryLayout: 'content',
+      columns: ['title','date'],
       schema: {
         title: fields.slug({ name: { label: 'タイトル' } }),
         description: fields.text({ label: '説明', multiline: true }),
