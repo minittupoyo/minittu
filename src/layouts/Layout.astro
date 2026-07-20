@@ -8,12 +8,14 @@ interface Props {
 	title?: string;
 	description?: string;
 	image?: string;
+	markdownUrl?: string;
 }
 
 const { 
 	title = 'みにっつのブログ', 
 	description = 'みにっつの超個人的備忘録。見ていてストレスのないシンプルな個人ブログ。',
-	image = '/placeholder.jpg'
+	image = '/placeholder.jpg',
+	markdownUrl,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin);
@@ -47,6 +49,7 @@ const isCurrentPage = (href: string) => href === '/' ? currentPath === '/' : cur
 
 		<!-- Canonical URL -->
 		<link rel="canonical" href={canonicalURL} />
+		{markdownUrl && <link rel="alternate" type="text/markdown" href={new URL(markdownUrl, Astro.url)} />}
 
 		<!-- Primary Meta Tags -->
 		<title>{title}</title>

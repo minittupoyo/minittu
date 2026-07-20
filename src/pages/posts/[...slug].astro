@@ -43,6 +43,7 @@ const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentInde
 	title={`${post.data.title} | みにっつのブログ`} 
 	description={post.data.description}
 	image={`/posts/${post.id}/og.png`}
+	markdownUrl={`/posts/${post.id}.md`}
 >
 	<div class="grid grid-cols-1 lg:grid-cols-4 gap-12 max-w-5xl mx-auto">
 		<!-- メインコンテンツ -->
@@ -77,7 +78,7 @@ const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentInde
 				{post.data.description}
 			</p>
 			
-			<div class="flex flex-wrap gap-1.5">
+			<div class="flex flex-wrap items-center gap-1.5">
 				{post.data.tags.map((tag) => (
 					<a
 						href={`/tags/${encodeURIComponent(tag)}`}
@@ -86,6 +87,14 @@ const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentInde
 						#{tag}
 					</a>
 				))}
+				<a
+					href={`/posts/${post.id}.md`}
+					type="text/markdown"
+					class="ml-auto inline-flex items-center gap-1 rounded-md border border-stone-200 bg-white px-2.5 py-0.5 text-xs font-medium text-stone-600 transition-colors duration-150 hover:border-stone-300 hover:text-stone-900"
+				>
+					<Icon name="tabler:markdown" class="h-4 w-4" aria-hidden="true" />
+					Markdownで読む
+				</a>
 			</div>
 		</header>
 
