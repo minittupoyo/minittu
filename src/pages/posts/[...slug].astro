@@ -37,6 +37,25 @@ const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.
 const currentIndex = sortedPosts.findIndex((p) => p.id === post.id);
 const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
 const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+const articleURL = new URL(`/posts/${post.id}`, Astro.site || Astro.url.origin);
+const articleImageURL = new URL(`/posts/${post.id}/og.png`, Astro.site || Astro.url.origin);
+const articleStructuredData = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: post.data.title,
+	description: post.data.description,
+	image: articleImageURL.href,
+	datePublished: post.data.date.toISOString(),
+	dateModified: (post.data.updatedDate ?? post.data.date).toISOString(),
+	mainEntityOfPage: articleURL.href,
+	inLanguage: 'ja-JP',
+	keywords: post.data.tags,
+	author: {
+		'@type': 'Person',
+		name: 'みにっつ',
+		url: new URL('/about', Astro.site || Astro.url.origin).href,
+	},
+};
 ---
 
 <Layout 
@@ -44,6 +63,11 @@ const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentInde
 	description={post.data.description}
 	image={`/posts/${post.id}/og.png`}
 	markdownUrl={`/posts/${post.id}.md`}
+	type="article"
+	publishedTime={post.data.date}
+	modifiedTime={post.data.updatedDate ?? post.data.date}
+	tags={post.data.tags}
+	structuredData={articleStructuredData}
 >
 	<div class="grid grid-cols-1 lg:grid-cols-4 gap-12 max-w-5xl mx-auto">
 		<!-- メインコンテンツ -->
@@ -61,8 +85,16 @@ const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentInde
 		<header class="mb-10 pb-8 border-b border-stone-200/60">
 			<div class="flex items-center gap-2 text-xs text-stone-500 mb-3">
 				<time datetime={post.data.date.toISOString()}>
-					{formatDate(post.data.date)}
+					公開: {formatDate(post.data.date)}
 				</time>
+				{post.data.updatedDate && (
+					<>
+						<span aria-hidden="true">·</span>
+						<time datetime={post.data.updatedDate.toISOString()}>
+							更新: {formatDate(post.data.updatedDate)}
+						</time>
+					</>
+				)}
 				{post.data.draft && (
 					<span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded-sm font-medium">
 						下書き

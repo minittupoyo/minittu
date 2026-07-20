@@ -19,6 +19,9 @@ export default config({
           label: '日付',
           validation: { isRequired: true },
         }),
+        updatedDate: fields.date({
+          label: '更新日（内容を更新した場合のみ）',
+        }),
         heroImage: fields.image({
           label: 'カバー画像 (アイキャッチ)',
           directory: 'src/assets/images/blog',
