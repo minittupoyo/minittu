@@ -126,6 +126,10 @@ details[open] > .theme-picker-panel {
   content: "" !important;
 }
 
+.prose img {
+    border-radius: 0.5rem !important;
+}
+
 @theme {
   --font-sans: 'Inter Variable', 'Noto Sans JP Variable', system-ui, -apple-system, sans-serif;
 }
